@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSON Exercise</title>
+</head>
+<body>
+    <h1>Task List</h1>
+    <div id="output">
+        <ul id="taskList"></ul>
+    </div>
+    <script type="text/javascript">
+        var data='[{"info":"Go to gym","status":false},{"info":"Clean room","status":true},{"info":"Make dinner","status":false},{"info":"Open windows","status":true}]';//remove white space 
+        var dataJSON =JSON.parse(data);//convert into json format
+        var output = document.getElementById('output');
+        var tasklist = document.querySelector('#taskList');//returns the first element that matches a CSS selector.
+        
+        //show the checklist
+        
+        for(var key in dataJSON){
+            
+            var status = dataJSON[key].status?'checked':'';
+            console.log(key,dataJSON[key],dataJSON[key].info,status)
+            var html='<li>'+dataJSON[key].info+'<input type="checkbox" value="'+key+'"'+status+'></li>';
+            tasklist.innerHTML+=html;
+        }
+        
+        addEvents()
+        //let it interactive
+        function addEvents(){
+            var checkBoxes = document.querySelectorAll('#taskList input[type="checkbox"]');
+            for(var index in checkBoxes){
+                checkBoxes[index].onchange=updateJSON;
+            }
+        }
+        
+        function updateJSON(){
+            var key = event.target.value;
+            console.log(key,event.target.checked)//key:issues, event.target.checked: "":"checked"
+            dataJSON[key].status =event.target.checked
+        }
+        //console.log(dataJSON)
+        
+    </script>
+</body>
+</html>
