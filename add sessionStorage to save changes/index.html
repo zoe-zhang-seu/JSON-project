@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSON Exercise</title>
+    <link rel="stylesheet" href="index.css">
+ 
+</head>
+<body>
+     <div class="web title">
+        <h1>List tasks </h1>
+     </div>
+     <div class="container">
+        <form id="myForm">
+            Task : 
+            <input type="text" name="task" placeholder="add task"> 
+            <input type="submit" value="Add new Task">
+            <p>press x to delete task</p>
+        </form>
+        <fieldset>
+            <legend> Tasks </legend>
+            <div id="output">
+                <ul id="taskList"></ul>
+            </div>
+        </fieldset>
+    </div>
+   
+    
+    <script type="text/javascript">
+        var dataJSON = '';
+        var output = document.getElementById('output');
+        var tasklist = document.querySelector('#taskList');//returns the first element that matches a CSS selector.
+        
+        //add new task into
+        document.getElementById('myForm').addEventListener('submit',function(e){
+            e.preventDefault();
+            var tempValue = document.querySelector('input[name="task"]').value//
+            //select from <input type="text" name="task" placeholder="add task"> 
+            
+            //invoke add new task function with gi
+            addNewItem({"info":tempValue,"status":false})
+            console.log(tempValue)
+        })
+        
+        
+        //Check the current storage and then load the json
+        window.onload = function(){
+            if(sessionStorage['task']!=null){//Store key/value pairs in browser
+                dataJSON =JSON.parse(sessionStorage['task']);
+            }
+            else{
+                var data='[{"info":"Go to gym","status":false},{"info":"Clean room","status":true},{"info":"Make dinner","status":false},{"info":"Open windows","status":true}]';//remove white space 
+                dataJSON =JSON.parse(data);//convert into json format
+            }
+            buildCheckboxes(dataJSON)
+        }
+        
+        //tasklist add new content
+        function addNewItem(data){
+            addCheckbox(data, dataJSON.length);
+            dataJSON.push(data);
+            sessionStorage['task'] = JSON.stringify(dataJSON);
+        }
+        
+        function addCheckbox(data,key){
+            var li = document.createElement('li');
+            var checkbox = document.createElement('input')
+            var textInside = document.createTextNode(data.info);
+            //prepare x for delete item
+            var span = document.createElement('span');
+            span.innerHTML = 'x';
+            span.onclick = remove;
+            
+            //store changes in info and checkbox status
+            checkbox.type = 'checkbox';
+            checkbox.value = key;
+            checkbox.checked = data.status;
+            checkbox.setAttribute('onchange', 'updateJSON()');
+            
+            li.appendChild(textInside);//load data.info
+            li.appendChild(checkbox);//load checkbox
+            li.appendChild(span);//load detele x
+            document.querySelector('#taskList').appendChild(li);
+            
+            
+        }
+        
+        function remove(event){
+            //console.log(event);
+            var index = this.previousElementSibling.value;
+            
+            //clear out tasklist 
+            tasklist.innerHTML = '';
+            dataJSON.splice(index,1)
+            //reload it 
+            buildCheckboxes(dataJSON)
+            
+            //store the sessionstorage,so that deleted item will not appear again
+            sessionStorage['task'] = JSON.stringify(dataJSON);
+        }
+        
+        function buildCheckboxes(data){
+            for(var key in data){
+            addCheckbox(data[key],key)
+            }              
+        }
+        
+        function updateJSON(){
+            var key = event.target.value;
+            dataJSON[key].status =event.target.checked
+            sessionStorage['task'] = JSON.stringify(dataJSON);//Store the changes in the browser.
+        }
+        
+        
+    </script>
+</body>
+</html>
